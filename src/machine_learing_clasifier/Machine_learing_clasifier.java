@@ -21,5 +21,6 @@ public class Machine_learing_clasifier {
     public static void main(String[] args) {
         // TODO code application logic here
     }
+
     
 }
