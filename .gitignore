@@ -8,3 +8,5 @@ dist/
 nbdist/ 
 .nb-gradle/
 nbproject/project.properties
+build.xml
+manifest.mf
