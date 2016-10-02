@@ -14,11 +14,7 @@ import weka.core.converters.ConverterUtils.DataSource;
  */
 public class LoadData {
 
-    public LoadData() {
-
-    }
-
-    public Instances getData(String filepath) throws Exception {
+    public static Instances getData(String filepath) throws Exception {
         DataSource source = new DataSource(filepath);
         Instances data = source.getDataSet();
         // setting class attribute if the data format does not provide this information
