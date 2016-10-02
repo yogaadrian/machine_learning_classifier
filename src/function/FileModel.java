@@ -35,8 +35,9 @@ public class FileModel {
         weka.core.SerializationHelper.write(outputpath, cls);
     }
 
-    public static void LoadModel(String sourcepath) throws Exception {
+    public static Classifier LoadModel(String sourcepath) throws Exception {
         // deserialize model
         Classifier cls = (Classifier) weka.core.SerializationHelper.read(sourcepath);
+        return cls;
     }
 }
