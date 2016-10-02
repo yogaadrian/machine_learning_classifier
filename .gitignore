@@ -1,8 +1,8 @@
-nbproject/
+nbproject/private/
+nbproject/build-impl.xml
+nbproject/genfiles.properties
 build/ 
 nbbuild/ 
 dist/ 
 nbdist/ 
 .nb-gradle/
-*.xml
-*.mf
