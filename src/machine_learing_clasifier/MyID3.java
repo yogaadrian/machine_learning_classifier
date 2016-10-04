@@ -20,7 +20,27 @@ public class MyID3 extends AbstractClassifier{
 
     @Override
     public void buildClassifier(Instances i) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (!i.classAttribute().isNominal()) {
+            throw new Exception("Class not nominal");
+        }
+        
+        Enumeration enumAttr = i.enumerateAttributes();
+        while(enumAttr.hasMoreElements()) {
+            Attribute attr = (Attribute) enumAttr.nextElement();
+            if (!attr.isNominal()) {
+                throw new Exception("Attribute not nominal");
+            }
+            Enumeration enumForMissingAttr = i.enumerateInstances();
+            while(enumForMissingAttr.hasMoreElements()) {
+                if (((Instance) enumForMissingAttr.nextElement()).isMissing(attr)) {
+                    throw new Exception("Missing value");
+                }
+            }
+        }
+        
+        i = new Instances(i);
+        i.deleteWithMissingClass();
+        //makeTree(i);
     }
     
     public double computeEntropy(Instances inst) {
