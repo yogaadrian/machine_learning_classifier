@@ -45,6 +45,16 @@ public class MyC45 extends AbstractClassifier {
 
     private double numericAttThreshold;
 
+    public MyC45 head;
+  
+    public MyC45(){
+        head=this;
+    }
+    
+    public MyC45(MyC45 head){
+        this.head=head;
+    }
+    
     @Override
     public void buildClassifier(Instances i) throws Exception {
         if (!i.classAttribute().isNominal()) {
@@ -53,7 +63,7 @@ public class MyC45 extends AbstractClassifier {
 
         //penanganan missing value
         for (int j = 0; j < i.numAttributes(); j++) {
-            Attribute attr = i.attribute(j);
+         Attribute attr = i.attribute(j);
             for (int k = 0; k < i.numInstances(); k++) {
                 Instance inst = i.instance(k);
                 if (inst.isMissing(attr)) {
@@ -86,6 +96,15 @@ public class MyC45 extends AbstractClassifier {
         }
     }
 
+    public void prune(Instance i){
+         if(m_Successors.length>0){
+             for(int a=0;a<m_Successors.length;a++){
+                 m_Successors[a].prune(i);
+                 
+             }
+         }
+    }
+    
     public double fillMissingValue(Instances i, Attribute att) {
         int[] jumlahvalue = new int[att.numValues()];
         for (int k = 0; k < i.numInstances(); k++) {
