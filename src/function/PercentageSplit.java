@@ -24,4 +24,15 @@ public class PercentageSplit {
         eval.evaluateModel(cls, test);
         System.out.println(eval.toSummaryString());
     }
+    
+    public static double percentageSplitRate(Instances data, Classifier cls) throws Exception {
+        int trainSize = (int) Math.round(data.numInstances() * 0.8);
+        int testSize = data.numInstances() - trainSize;
+        Instances train = new Instances(data, 0, trainSize);
+        Instances test = new Instances(data, trainSize, testSize);
+        
+        Evaluation eval = new Evaluation(train);
+        eval.evaluateModel(cls, test);
+        return eval.pctCorrect();
+    }
 }

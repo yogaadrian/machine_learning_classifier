@@ -5,6 +5,7 @@
  */
 package machine_learing_clasifier;
 
+import function.PercentageSplit;
 import java.util.Enumeration;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Attribute;
@@ -45,16 +46,17 @@ public class MyC45 extends AbstractClassifier {
 
     private double numericAttThreshold;
 
-    public MyC45 head;
-  
-    public MyC45(){
-        head=this;
+    public MyC45 head, parent;
+
+    public MyC45() {
+        head = this;
     }
-    
-    public MyC45(MyC45 head){
-        this.head=head;
+
+    public MyC45(MyC45 head, MyC45 parent) {
+        this.head = head;
+        this.parent = parent;
     }
-    
+
     @Override
     public void buildClassifier(Instances i) throws Exception {
         if (!i.classAttribute().isNominal()) {
@@ -63,7 +65,7 @@ public class MyC45 extends AbstractClassifier {
 
         //penanganan missing value
         for (int j = 0; j < i.numAttributes(); j++) {
-         Attribute attr = i.attribute(j);
+            Attribute attr = i.attribute(j);
             for (int k = 0; k < i.numInstances(); k++) {
                 Instance inst = i.instance(k);
                 if (inst.isMissing(attr)) {
@@ -96,15 +98,34 @@ public class MyC45 extends AbstractClassifier {
         }
     }
 
-    public void prune(Instance i){
-         if(m_Successors.length>0){
-             for(int a=0;a<m_Successors.length;a++){
-                 m_Successors[a].prune(i);
-                 
-             }
-         }
+    public void prune(Instances i) throws Exception {
+        if (m_Successors != null) {
+            System.out.println("test");
+            for (int a = 0; a < m_Successors.length; a++) {
+                m_Successors[a].prune(i);
+                calculateErrorPrune(i, a);
+                break;
+            }
+        }
     }
-    
+
+    public void calculateErrorPrune(Instances i, int order) throws Exception {
+        double before, after;
+        before = PercentageSplit.percentageSplitRate(i, head);
+        System.out.println("Order " +order);
+        MyC45 temp = this.parent.m_Successors[order];
+        this.parent.m_Successors[order] = null;
+        after = PercentageSplit.percentageSplitRate(i, head);
+        System.out.println("after " + after);
+        System.out.println("before" + before);
+        System.out.println("");
+        if (before < after) {
+            this.parent.m_Successors[order] = temp;
+        } else {
+            System.out.println("prune!!!");
+        }
+    }
+
     public double fillMissingValue(Instances i, Attribute att) {
         int[] jumlahvalue = new int[att.numValues()];
         for (int k = 0; k < i.numInstances(); k++) {
@@ -226,15 +247,19 @@ public class MyC45 extends AbstractClassifier {
             }
 
             if (m_Attribute.isNominal()) {
+                System.out.println("nominal");
                 m_Successors = new MyC45[m_Attribute.numValues()];
+                System.out.println(m_Successors.length);
                 for (int j = 0; j < m_Attribute.numValues(); j++) {
-                    m_Successors[j] = new MyC45();
+                    m_Successors[j] = new MyC45(head, this);
                     m_Successors[j].buildClassifier(splitData[j]);
                 }
-            }else{
+            } else {
+                System.out.println("numeric");
                 m_Successors = new MyC45[2];
+                System.out.println(m_Successors.length);
                 for (int j = 0; j < 2; j++) {
-                    m_Successors[j] = new MyC45();
+                    m_Successors[j] = new MyC45(head, this);
                     m_Successors[j].buildClassifier(splitData[j]);
                 }
             }

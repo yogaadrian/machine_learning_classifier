@@ -31,11 +31,14 @@ public class Machine_learing_clasifier {
         // TODO code application logic here
 
 
-        Instances data = new Instances(LoadData.getData("D:\\Documents\\ML\\machine_learing_clasifier\\weather.numeric.arff"));
-//        myc45.buildClassifier(data);
-        Evaluation evaluation = new Evaluation(data);
-        evaluation.crossValidateModel(myc45, data, 10, new Random(1));
-        System.out.println(evaluation.toSummaryString());
+        Instances data = new Instances(LoadData.getData("D:\\Documents\\ML\\machine_learing_clasifier\\weather.nominal.arff"));
+        myc45.buildClassifier(data);
+        myc45.prune(data);
+       // System.out.println("");
+        
+//        Evaluation evaluation = new Evaluation(data);
+//        evaluation.crossValidateModel(myc45, data, 10, new Random(1));
+//        System.out.println(evaluation.pctCorrect());
         
 
 //        Instances data = new Instances(LoadData.getData("E:\\machine_learning_classifier\\weather.nominal.arff"));
