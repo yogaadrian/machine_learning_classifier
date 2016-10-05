@@ -68,6 +68,24 @@ public class MyC45 extends AbstractClassifier {
         makeTree(i);
     }
 
+    public double classifyInstance(Instance instance) {
+        if (m_Attribute == null) {
+            return m_ClassValue;
+        } else {
+            if (m_Attribute.isNominal()) {
+                return m_Successors[(int) instance.value(m_Attribute)].classifyInstance(instance);
+            } else if (m_Attribute.isNumeric()) {
+                if (instance.value(m_Attribute) < numericAttThreshold) {
+                    return m_Successors[0].classifyInstance(instance);
+                } else {
+                    return m_Successors[1].classifyInstance(instance);
+                }
+            } else {
+                return -1;
+            }
+        }
+    }
+
     public double fillMissingValue(Instances i, Attribute att) {
         int[] jumlahvalue = new int[att.numValues()];
         for (int k = 0; k < i.numInstances(); k++) {
@@ -188,10 +206,18 @@ public class MyC45 extends AbstractClassifier {
                 splitData = splitDataContinous(data, m_Attribute, numericAttThreshold);
             }
 
-            m_Successors = new MyC45[m_Attribute.numValues()];
-            for (int j = 0; j < m_Attribute.numValues(); j++) {
-                m_Successors[j] = new MyC45();
-                m_Successors[j].buildClassifier(splitData[j]);
+            if (m_Attribute.isNominal()) {
+                m_Successors = new MyC45[m_Attribute.numValues()];
+                for (int j = 0; j < m_Attribute.numValues(); j++) {
+                    m_Successors[j] = new MyC45();
+                    m_Successors[j].buildClassifier(splitData[j]);
+                }
+            }else{
+                m_Successors = new MyC45[2];
+                for (int j = 0; j < 2; j++) {
+                    m_Successors[j] = new MyC45();
+                    m_Successors[j].buildClassifier(splitData[j]);
+                }
             }
         }
     }
