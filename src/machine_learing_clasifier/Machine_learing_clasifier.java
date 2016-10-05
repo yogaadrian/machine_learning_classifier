@@ -9,6 +9,7 @@
 package machine_learing_clasifier;
 import function.CrossValidation;
 import function.LoadData;
+import function.PercentageSplit;
 import java.util.Random;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
@@ -28,6 +29,7 @@ public class Machine_learing_clasifier {
      */
     public static void main(String[] args) throws Exception {
         // TODO code application logic here
+
 
         Instances data = new Instances(LoadData.getData("D:\\Documents\\ML\\machine_learing_clasifier\\weather.numeric.arff"));
 //        myc45.buildClassifier(data);
