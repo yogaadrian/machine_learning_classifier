@@ -20,7 +20,7 @@ import weka.core.Utils;
 public class MyID3 extends AbstractClassifier{
     
     /** The node's successors. */ 
-    private Id3[] m_Successors;
+    private MyID3[] m_Successors;
 
     /** Attribute used for splitting. */
     private Attribute m_Attribute;
@@ -33,7 +33,10 @@ public class MyID3 extends AbstractClassifier{
 
     /** Class attribute of dataset. */
     private Attribute m_ClassAttribute;
-
+    
+    public MyID3() {
+    
+    }
 
     @Override
     public void buildClassifier(Instances i) throws Exception {
@@ -57,7 +60,7 @@ public class MyID3 extends AbstractClassifier{
         
         i = new Instances(i);
         i.deleteWithMissingClass();
-        //makeTree(i);
+        makeTree(i);
     }
     
     public double computeEntropy(Instances inst) {
@@ -70,7 +73,7 @@ public class MyID3 extends AbstractClassifier{
         double entropy = 0;
         for (int i = 0; i < inst.numClasses(); i++) {
             if (classCount[i] > 0) {
-                entropy -= classCount[i] * Utils.log2(classCount[i]/classCount[inst.numInstances()]);
+                entropy -= classCount[i] * Utils.log2(classCount[i]/inst.numInstances());
             }
         }
         entropy /= (double) inst.numInstances();
@@ -106,9 +109,10 @@ public class MyID3 extends AbstractClassifier{
     public void makeTree(Instances data) throws Exception{
         // Check if no instances have reached this node.
         if (data.numInstances() == 0) {
+            System.out.println("Attribut terakhir = "+m_Attribute.toString());
           return;
         }
-
+        System.out.println("data numIns = "+data.numInstances());
         // Compute attribute with maximum information gain.
         double[] infoGains = new double[data.numAttributes()];
         Enumeration attEnum = data.enumerateAttributes();
@@ -117,7 +121,7 @@ public class MyID3 extends AbstractClassifier{
           infoGains[att.index()] = computeInformationGain(data, att);
         }
         m_Attribute = data.attribute(Utils.maxIndex(infoGains));
-
+        System.out.println("huhu = " + m_Attribute.toString());
         // Make leaf if information gain is zero. 
         // Otherwise create successors.
         if (Utils.eq(infoGains[m_Attribute.index()], 0)) {
@@ -133,12 +137,11 @@ public class MyID3 extends AbstractClassifier{
           m_ClassAttribute = data.classAttribute();
         } else {
           Instances[] splitData = splitData(data, m_Attribute);
-          m_Successors = new Id3[m_Attribute.numValues()];
+          m_Successors = new MyID3[m_Attribute.numValues()];
           for (int j = 0; j < m_Attribute.numValues(); j++) {
-            m_Successors[j] = new Id3();
+            m_Successors[j] = new MyID3();
             m_Successors[j].buildClassifier(splitData[j]);
           }
         }
-        
     }
 }
