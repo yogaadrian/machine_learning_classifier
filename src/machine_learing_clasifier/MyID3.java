@@ -7,6 +7,7 @@ package machine_learing_clasifier;
 
 import java.util.Enumeration;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.trees.Id3;
 import weka.core.Attribute;
 import weka.core.Instance;
 import weka.core.Instances;
@@ -17,6 +18,22 @@ import weka.core.Utils;
  * @author yoga
  */
 public class MyID3 extends AbstractClassifier{
+    
+    /** The node's successors. */ 
+    private Id3[] m_Successors;
+
+    /** Attribute used for splitting. */
+    private Attribute m_Attribute;
+
+    /** Class value if node is leaf. */
+    private double m_ClassValue;
+
+    /** Class distribution if node is leaf. */
+    private double[] m_Distribution;
+
+    /** Class attribute of dataset. */
+    private Attribute m_ClassAttribute;
+
 
     @Override
     public void buildClassifier(Instances i) throws Exception {
@@ -84,5 +101,44 @@ public class MyID3 extends AbstractClassifier{
         }
         
         return split;
+    }
+    
+    public void makeTree(Instances data) throws Exception{
+        // Check if no instances have reached this node.
+        if (data.numInstances() == 0) {
+          return;
+        }
+
+        // Compute attribute with maximum information gain.
+        double[] infoGains = new double[data.numAttributes()];
+        Enumeration attEnum = data.enumerateAttributes();
+        while (attEnum.hasMoreElements()) {
+          Attribute att = (Attribute) attEnum.nextElement();
+          infoGains[att.index()] = computeInformationGain(data, att);
+        }
+        m_Attribute = data.attribute(Utils.maxIndex(infoGains));
+
+        // Make leaf if information gain is zero. 
+        // Otherwise create successors.
+        if (Utils.eq(infoGains[m_Attribute.index()], 0)) {
+          m_Attribute = null;
+          m_Distribution = new double[data.numClasses()];
+          Enumeration instEnum = data.enumerateInstances();
+          while (instEnum.hasMoreElements()) {
+            Instance inst = (Instance) instEnum.nextElement();
+            m_Distribution[(int) inst.classValue()]++;
+          }
+          Utils.normalize(m_Distribution);
+          m_ClassValue = Utils.maxIndex(m_Distribution);
+          m_ClassAttribute = data.classAttribute();
+        } else {
+          Instances[] splitData = splitData(data, m_Attribute);
+          m_Successors = new Id3[m_Attribute.numValues()];
+          for (int j = 0; j < m_Attribute.numValues(); j++) {
+            m_Successors[j] = new Id3();
+            m_Successors[j].buildClassifier(splitData[j]);
+          }
+        }
+        
     }
 }
