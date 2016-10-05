@@ -119,7 +119,7 @@ public class MyID3 extends AbstractClassifier{
         }
         
         m_Attribute = data.attribute(Utils.maxIndex(infoGains));
-        System.out.println("huhu = " + m_Attribute.toString());
+        //System.out.println("huhu = " + m_Attribute.toString());
         
         if (Utils.eq(infoGains[m_Attribute.index()], 0)) {
           m_Attribute = null;
