@@ -140,4 +140,13 @@ public class MyID3 extends AbstractClassifier{
           }
         }
     }
+    
+    public double classifyInstance(Instance instance){
+        if(m_Attribute == null){
+            return m_ClassValue;
+        }
+        else{
+            return m_Successors[(int) instance.value(m_Attribute)].classifyInstance(instance);
+        }
+    }
 }
