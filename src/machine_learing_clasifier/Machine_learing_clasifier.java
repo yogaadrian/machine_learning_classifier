@@ -9,6 +9,7 @@
 package machine_learing_clasifier;
 import function.CrossValidation;
 import function.LoadData;
+import function.PercentageSplit;
 import java.util.Random;
 import weka.classifiers.Evaluation;
 import weka.classifiers.trees.J48;
@@ -28,21 +29,8 @@ public class Machine_learing_clasifier {
      */
     public static void main(String[] args) throws Exception {
         // TODO code application logic here
-
         Instances data = new Instances(LoadData.getData("/home/ginanjarbusiri/Documents/Machine Learning/machine_learning_classifier/weather.nominal.arff"));
-//        myc45.buildClassifier(data);
-        Evaluation evaluation = new Evaluation(data);
-        evaluation.crossValidateModel(myid3, data, 10, new Random(1));
-        System.out.println(evaluation.toSummaryString());
-        
-
-//        Instances data = new Instances(LoadData.getData("E:\\machine_learning_classifier\\weather.nominal.arff"));
-//        myid3.buildClassifier(data);
-//        for(int i = 0; i < data.size(); i++){
-//            double sesuatu = myid3.classifyInstance(data.get(i));
-//            System.out.println("output = "+sesuatu);
-//        }
-
+        CrossValidation.crossValidation(data, myid3);
     }
     
 }
