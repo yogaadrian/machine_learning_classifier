@@ -44,15 +44,15 @@ public class MyID3 extends AbstractClassifier{
             throw new Exception("Class not nominal");
         }
         
-        Enumeration enumAttr = i.enumerateAttributes();
-        while(enumAttr.hasMoreElements()) {
-            Attribute attr = (Attribute) enumAttr.nextElement();
+        for (int j = 0; j < i.numAttributes(); j++) {
+            Attribute attr = i.attribute(j);
             if (!attr.isNominal()) {
                 throw new Exception("Attribute not nominal");
             }
-            Enumeration enumForMissingAttr = i.enumerateInstances();
-            while(enumForMissingAttr.hasMoreElements()) {
-                if (((Instance) enumForMissingAttr.nextElement()).isMissing(attr)) {
+            
+            for (int k = 0; k < i.numInstances(); k++) {
+                Instance inst = i.instance(k);
+                if (inst.isMissing(attr)) {
                     throw new Exception("Missing value");
                 }
             }
@@ -65,10 +65,9 @@ public class MyID3 extends AbstractClassifier{
     
     public double computeEntropy(Instances inst) {
         double[] classCount = new double[inst.numClasses()];
-        Enumeration instEnum = inst.enumerateInstances();
-        while(instEnum.hasMoreElements()) {
-            Instance temp = (Instance) instEnum.nextElement();
-            classCount[(int) temp.classValue()]++;
+        for (int i = 0; i < inst.numInstances(); i++) {
+            int temp = (int) inst.instance(i).classValue();
+            classCount[temp]++;
         }
         double entropy = 0;
         for (int i = 0; i < inst.numClasses(); i++) {
@@ -97,40 +96,37 @@ public class MyID3 extends AbstractClassifier{
         for (int i = 0; i < attr.numValues(); i++) {
             split[i] = new Instances(inst, inst.numInstances());
         }
-        Enumeration instEnum = inst.enumerateInstances();
-        while (instEnum.hasMoreElements()) {
-            Instance temp = (Instance) instEnum.nextElement();
-            split[(int) temp.value(attr)].add(temp);
+
+        for (int i = 0; i < inst.numInstances(); i++) {
+            int temp = (int) inst.instance(i).value(attr);
+            split[temp].add(inst.instance(i));
         }
         
         return split;
     }
     
     public void makeTree(Instances data) throws Exception{
-        // Check if no instances have reached this node.
         if (data.numInstances() == 0) {
-            System.out.println("Attribut terakhir = "+m_Attribute.toString());
           return;
         }
-        System.out.println("data numIns = "+data.numInstances());
-        // Compute attribute with maximum information gain.
+        
         double[] infoGains = new double[data.numAttributes()];
-        Enumeration attEnum = data.enumerateAttributes();
-        while (attEnum.hasMoreElements()) {
-          Attribute att = (Attribute) attEnum.nextElement();
-          infoGains[att.index()] = computeInformationGain(data, att);
+        for (int i = 0; i < data.numAttributes(); i++) {
+            Attribute att = data.attribute(i);
+            if (data.classIndex() != att.index()) {
+                infoGains[att.index()] = computeInformationGain(data, att);
+            }
         }
+        
         m_Attribute = data.attribute(Utils.maxIndex(infoGains));
         System.out.println("huhu = " + m_Attribute.toString());
-        // Make leaf if information gain is zero. 
-        // Otherwise create successors.
+        
         if (Utils.eq(infoGains[m_Attribute.index()], 0)) {
           m_Attribute = null;
           m_Distribution = new double[data.numClasses()];
-          Enumeration instEnum = data.enumerateInstances();
-          while (instEnum.hasMoreElements()) {
-            Instance inst = (Instance) instEnum.nextElement();
-            m_Distribution[(int) inst.classValue()]++;
+          for (int i = 0; i < data.numInstances(); i++) {
+                int inst = (int) data.instance(i).value(data.classAttribute());
+                m_Distribution[inst]++;
           }
           Utils.normalize(m_Distribution);
           m_ClassValue = Utils.maxIndex(m_Distribution);
