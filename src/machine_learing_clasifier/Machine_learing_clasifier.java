@@ -33,6 +33,7 @@ public class Machine_learing_clasifier {
 
         Instances data = new Instances(LoadData.getData("D:\\Documents\\ML\\machine_learing_clasifier\\weather.nominal.arff"));
         myc45.buildClassifier(data);
+        System.out.println("mulai prune");
         myc45.prune(data);
        // System.out.println("");
         

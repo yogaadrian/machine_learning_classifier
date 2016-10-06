@@ -21,4 +21,10 @@ public class CrossValidation {
         evaluation.crossValidateModel(cls, data, 10, new Random(1));
         System.out.println(evaluation.toSummaryString());
     }
+    
+    public static double crossValidationrate(Instances data, AbstractClassifier cls) throws Exception {
+        Evaluation evaluation = new Evaluation(data);
+        evaluation.crossValidateModel(cls, data, 10, new Random(1));
+        return evaluation.pctCorrect();
+    }
 }

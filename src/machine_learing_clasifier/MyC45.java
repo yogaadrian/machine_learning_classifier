@@ -100,29 +100,45 @@ public class MyC45 extends AbstractClassifier {
 
     public void prune(Instances i) throws Exception {
         if (m_Successors != null) {
-            System.out.println("test");
             for (int a = 0; a < m_Successors.length; a++) {
+                System.out.println("a " + a);
                 m_Successors[a].prune(i);
-                calculateErrorPrune(i, a);
-                break;
+                if (parent != null) {
+                    if (calculateErrorPrune(i, a)) {
+                        break;
+                    };
+                }
+
             }
         }
     }
 
-    public void calculateErrorPrune(Instances i, int order) throws Exception {
+    public boolean calculateErrorPrune(Instances i, int order) throws Exception {
         double before, after;
         before = PercentageSplit.percentageSplitRate(i, head);
-        System.out.println("Order " +order);
-        MyC45 temp = this.parent.m_Successors[order];
-        this.parent.m_Successors[order] = null;
-        after = PercentageSplit.percentageSplitRate(i, head);
-        System.out.println("after " + after);
-        System.out.println("before" + before);
-        System.out.println("");
-        if (before < after) {
-            this.parent.m_Successors[order] = temp;
+        //MyC45 temp = this.parent.m_Successors[order];
+        Attribute temp = this.parent.m_Attribute;
+        this.parent.m_Attribute = null;
+        double maxafter = 0;
+        double maxclass = -1;
+        for (int x = 0; x < i.numClasses(); x++) {
+            this.parent.m_ClassValue = (double) x;
+            after = PercentageSplit.percentageSplitRate(i, head);
+            if (after > maxafter) {
+                maxclass = x;
+                maxafter = after;
+            }
+        }
+
+        this.parent.m_ClassValue = maxclass;
+
+        //this.parent.m_Successors[order] = null;
+        if (before >= maxafter) {
+            this.parent.m_Attribute = temp;
+            return false;
         } else {
             System.out.println("prune!!!");
+            return true;
         }
     }
 
